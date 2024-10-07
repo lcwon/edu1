@@ -66,13 +66,19 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Scan Docker image with Trivy
-        uses: aquasecurity/trivy-action@v0.12.0
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@0.20.0
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.name }}
-          ignore-unfixed: true  # Optional: Ignore vulnerabilities without fixes
-          vuln-type: os,library # Optional: Specify the types of vulnerabilities to check
-          severity: HIGH,CRITICAL # Optional: Specify severity levels to consider
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
 
       # Optional: Fail the job if Trivy finds vulnerabilities
       - name: Check Trivy scan result
