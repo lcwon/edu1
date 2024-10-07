@@ -19,13 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write  # 이 부분이 GHCR 푸시를 위해 필요합니다.
-      id-token: write
+      packages: write  # GHCR 푸시를 위해 필요합니다.
+      id-token: write  # Cosign 서명 등에 필요합니다.
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Install the cosign tool except on PR
       - name: Install cosign
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3
@@ -63,6 +64,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      # Run Trivy vulnerability scanner in repo mode
       - name: Run Trivy vulnerability scanner in repo mode
         uses: aquasecurity/trivy-action@0.20.0
         with:
@@ -72,6 +74,7 @@ jobs:
           output: 'trivy-results.sarif'
           severity: 'CRITICAL'
 
+      # Upload Trivy scan results to GitHub Security tab
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
