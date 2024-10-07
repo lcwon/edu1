@@ -10,7 +10,6 @@ RUN pip install -r requirements.txt
 
 RUN ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo Asia/Seoul > /etc/timezone
 
-ENV MYSQL_ROOT_PASSWORD: wordpress
 # unblock port 80 for the Flask app to run on
 EXPOSE 40003
 
