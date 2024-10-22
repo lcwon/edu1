@@ -1,4 +1,4 @@
-name: Publish Docker Multi Platform GitHub image
+name: chaewonworkflow
 
 on:
   workflow_dispatch:
